@@ -1,0 +1,15 @@
+# Use official MySQL image as base
+FROM mysql:8.0
+
+# Set environment variables (
+ENV MYSQL_ROOT_PASSWORD=rootpassword
+ENV MYSQL_DATABASE=printing_app
+ENV MYSQL_USER=appuser
+ENV MYSQL_PASSWORD=apppassword
+
+# Copy initialization SQL script (optional: to create tables automatically)
+# If you place init.sql in same directory as Dockerfile, it will run at startup
+COPY ./init.sql /docker-entrypoint-initdb.d/
+
+# Expose MySQL port
+EXPOSE 3306

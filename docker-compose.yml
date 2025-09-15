@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  mysql:
+    build: ./database
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: printing_app
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: printwiz_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: mysql       
+      DB_USER: appuser     
+      DB_PASS: apppassword 
+      DB_NAME: printing_app
+    depends_on:
+      mysql:
+        condition: service_healthy  
+
+  frontend:
+    build: ./print-wiz-studio
+    container_name: printwiz_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
